@@ -2,7 +2,8 @@
   
   require "database.php";
 
-  $contacts = mysqli_query($connection, "SELECT * FROM contacts") or die(mysql_error()); 
+  $contacts = $connection->query("SELECT * FROM contacts");
+
 ?>
 
 <!DOCTYPE html>

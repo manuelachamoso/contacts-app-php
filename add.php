@@ -2,18 +2,32 @@
 
 require 'database.php';
 
-  if($_SERVER["REQUEST_METHOD"] == "POST") {
+$error = null;
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+  if (empty($_POST["name"]) || empty($_POST["phone_number"])) {
+      $error = "Please fill all the fields.";
+  } else if (strlen($_POST["phone_number"]) < 9) {
+      $error = "Phone number must be at least 9 characters.";
+  } else if (!preg_match('/^\d{9,}$/', $_POST["phone_number"])) {
+      $error = "Invalid phone number format. Phone number must contain only digits and be at least 9 characters long.";
+  } else {
+      // Valid input, proceed with database insertion
       $name = $_POST["name"];
       $phoneNumber = $_POST["phone_number"];
 
-      $statement = $connection->prepare("INSERT INTO contacts (name, phone_number) VALUES ('$name', '$phoneNumber')");
+      // Prepare and execute the query with parameterized values
+      $statement = $connection->prepare("INSERT INTO contacts (name, phone_number) VALUES (:name, :phone_number)");
+      $statement->bindParam(":name", $name);
+      $statement->bindParam(":phone_number", $phoneNumber);
       $statement->execute();
-      
-    header("Location: index.php");
+
+      header("Location: index.php");
   }
+}
+
+
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -80,12 +94,18 @@ require 'database.php';
           <div class="card">
             <div class="card-header">Add New Contact</div>
             <div class="card-body">
+
+              <?php if($error) : ?>
+                  <p class="text-danger">
+                    <?= $error ?>
+                  </p>
+                <?php endif ?>
               <form method="POST" action="add.php">
                 <div class="mb-3 row">
                   <label for="name" class="col-md-4 col-form-label text-md-end">Name</label>
-    
+
                   <div class="col-md-6">
-                    <input id="name" type="text" class="form-control" name="name" required autocomplete="name" autofocus>
+                    <input id="name" type="text" class="form-control" name="name" autocomplete="name" autofocus>
                   </div>
                 </div>
     
@@ -93,7 +113,7 @@ require 'database.php';
                   <label for="phone_number" class="col-md-4 col-form-label text-md-end">Phone Number</label>
     
                   <div class="col-md-6">
-                    <input id="phone_number" type="tel" class="form-control" name="phone_number" required autocomplete="phone_number" autofocus>
+                    <input id="phone_number" type="tel" class="form-control" name="phone_number" autocomplete="phone_number" autofocus>
                   </div>
                 </div>
     
