@@ -1,11 +1,8 @@
 <?php 
   
-  if (file_exists("contacts.json")) {
-    $contacts = json_decode(file_get_contents("contacts.json"), true);
-  } else {
-    $contacts = [];
-  }
-  
+  require "database.php";
+
+  $contacts = mysqli_query($connection, "SELECT * FROM contacts") or die(mysql_error()); 
 ?>
 
 <!DOCTYPE html>

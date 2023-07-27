@@ -8,6 +8,7 @@ require 'database.php';
 
       $statement = $connection->prepare("INSERT INTO contacts (name, phone_number) VALUES ('$name', '$phoneNumber')");
       $statement->execute();
+      
     header("Location: index.php");
   }
 ?>
